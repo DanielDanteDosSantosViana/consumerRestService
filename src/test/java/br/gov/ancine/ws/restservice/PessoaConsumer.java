@@ -3,12 +3,12 @@ package br.gov.ancine.ws.restservice;
 import java.util.HashMap;
 import java.util.Map;
 
-import br.gov.ancine.ws.restservice.core.Consumer;
-import br.gov.ancine.ws.restservice.core.Search;
+import br.gov.ancine.ws.restservice.core.consumer.AbstractConsumer;
 import br.gov.ancine.ws.restservice.core.exception.ServiceErrorException;
 import br.gov.ancine.ws.restservice.core.protocol.mensage.Response;
+import br.gov.ancine.ws.restservice.core.searchParameter.Search;
 
-public class PessoaConsumer extends Consumer {
+public class PessoaConsumer extends AbstractConsumer {
 
 	/**
 	 * 

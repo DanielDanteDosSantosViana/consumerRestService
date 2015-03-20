@@ -1,4 +1,4 @@
-package br.gov.ancine.ws.restservice.core;
+package br.gov.ancine.ws.restservice.core.searchParameter;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;

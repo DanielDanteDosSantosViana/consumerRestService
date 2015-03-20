@@ -1,7 +1,8 @@
-package br.gov.ancine.ws.restservice.core;
+package br.gov.ancine.ws.restservice.core.searchParameter;
 
 import java.util.Map;
 import java.util.Set;
+
 
 public class Search<T> extends SearchParameterUri<T> {
 
