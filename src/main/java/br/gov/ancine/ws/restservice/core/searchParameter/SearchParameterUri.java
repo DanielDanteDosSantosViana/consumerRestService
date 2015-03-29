@@ -1,54 +1,41 @@
 package br.gov.ancine.ws.restservice.core.searchParameter;
 
-import java.lang.reflect.ParameterizedType;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
-public abstract class SearchParameterUri<T>{
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class SearchParameterUri implements Search{
+
+	static final Logger logger = LoggerFactory.getLogger(SearchParameterUri.class);
 
 	protected String target;
-	 
-	protected Map<String, String> searchParameter = new HashMap<String, String>();
-
-	private Class<T> type;
+	protected Parameter searchParameter;
 	
 	
-	@SuppressWarnings("unchecked")
-	public SearchParameterUri(String target , Map<String, String> searchParameter){
+	
+	public SearchParameterUri(String target , Parameter ParamUri){
 		this.target = target;
-		this.searchParameter = searchParameter;
-		this.type = (Class<T>) ((ParameterizedType) getClass()  
-                .getGenericSuperclass()).getActualTypeArguments()[0]; 
-		System.out.print("TESTE");
-		
+		this.searchParameter = ParamUri;
 	}
-	
-	@SuppressWarnings("unchecked")
-	public SearchParameterUri(String target){
-		this.target =target;
-		this.type = (Class<T>) ((ParameterizedType) getClass()  
-                .getGenericSuperclass()).getActualTypeArguments()[0]; 
-	}
-	@SuppressWarnings("unchecked")
-	public SearchParameterUri(){
-		this.type = (Class<T>) ((ParameterizedType) getClass()  
-                .getGenericSuperclass()).getActualTypeArguments()[0]; 
-	}
-
-	
 	public String getTarget() {
 		   modifyTargetUri();
 		return target;
-	
 	}
-	
-	public void modifyTargetUri(){insertParameterToUrl();}
 
-	protected abstract void insertParameterToUrl();
+	public void modifyTargetUri(){insertParameterToUrl();}
 	
-	public Class<T> getType() {
-		return type;
+	private void insertParameterToUrl() {
+		if(searchParameter!=null && !searchParameter.getParameter().isEmpty()){
+			   Set<String> keys = searchParameter.getParameter().keySet();
+			   for (String chave : keys) {
+				  if(target.contains(chave)){
+					  target = target.replace(chave,searchParameter.getParameter().get(chave)); 
+				  }
+			   }
+		  	 }
 	}
+
 
 
 

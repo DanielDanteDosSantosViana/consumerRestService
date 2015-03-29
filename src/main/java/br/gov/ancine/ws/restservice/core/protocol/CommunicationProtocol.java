@@ -1,7 +1,14 @@
+/*===========================================================================
+COPYRIGHT 2015 Daniel Viana ALL RIGHTS RESERVED.
+This software cannot be copied, stored, distributed without
+Daniel Viana prior authorization.
+This file was made available on https://github.com/DanielDanteDosSantosViana and it
+is free to be redistributed or used under Creative Commons license 2.5 br:
+http://creativecommons.org/licenses/by-sa/2.5/br/
+============================================================================*/
 package br.gov.ancine.ws.restservice.core.protocol;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,22 +16,28 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 
-import br.gov.ancine.ws.restservice.core.exception.ServiceErrorException;
-import br.gov.ancine.ws.restservice.core.parser.ParserJSON;
-import br.gov.ancine.ws.restservice.core.protocol.mensage.ErrorResponse;
-import br.gov.ancine.ws.restservice.core.protocol.mensage.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class CommunicationProtocol<T> {
+import br.gov.ancine.ws.restservice.core.exception.ComunicationProtocolException;
+import br.gov.ancine.ws.restservice.core.protocol.mensage.ResponseProtocol;
+import br.gov.ancine.ws.restservice.core.searchParameter.SearchParameterUri;
+
+public class CommunicationProtocol {
 	
+	static final Logger logger = LoggerFactory.getLogger(SearchParameterUri.class);
+
+	public ResponseProtocol httpGet(String urlWebService) throws ComunicationProtocolException{
 		
-	public  Object httpGet(Class<?> tipoObjetoRetorno, String urlWebService) throws ServiceErrorException{
-		
-		HttpURLConnection connection = null;
-			  	
-		try{		  
-			   URL url = new URL(urlWebService);
+			HttpURLConnection connection = null;
+			URL url;
+			try {
+				url = new URL(urlWebService);
+
 			   connection = (HttpURLConnection) url.openConnection();
 			   connection.setRequestMethod("GET");
 			   connection.setConnectTimeout(15000);
@@ -33,30 +46,35 @@ public class CommunicationProtocol<T> {
 			   String responseJson = null;
 			   
 			   if(isStatusCodeOK(statusCode)){
-				   	 responseJson = inputStreamToString(connection.getInputStream());
-				   	 T objectResponse = (T)ParserJSON.fromJson(responseJson, tipoObjetoRetorno);
-				   	 Response<T> responseOK = new Response<T>(null,objectResponse);
-				   	 connection.disconnect();
-				   	 return responseOK;
+				   responseJson = inputStreamToString(connection.getInputStream());
+				   connection.disconnect();
+				   return new ResponseProtocol(statusCode, responseJson);
 				   	
 			   }else if(isStatusCode4xx(statusCode)){
 				   	 responseJson = inputStreamToString(connection.getErrorStream());
-				   	 ErrorResponse erroResponse = (ErrorResponse)ParserJSON.fromJson(responseJson, ErrorResponse.class);
-				   	 Response<T> response4xx = new Response<T>(erroResponse,null);
 				   	 connection.disconnect();
-				   	 return response4xx;
+				   	 return new ResponseProtocol(statusCode, responseJson);
 				   	 
 			   }else{
+				   logger.warn("Error Interno no Servidor status code "+statusCode);
 				   
-				   throw new ServiceErrorException("Error Interno no Servidor : "+inputStreamToString(connection.getErrorStream()));
+				   throw new ComunicationProtocolException("Error Interno no Servidor status code : "+statusCode
+						   +", Causado por : "+inputStreamToString(connection.getErrorStream()));
 			   }
+			
+			} catch (MalformedURLException e) {
+				   logger.warn("Error ao tentar montar URL : ",e);
+				   throw new ComunicationProtocolException(e);
+
+			} catch (ProtocolException e) {
+				   throw new ComunicationProtocolException(e);
+
+			} catch (IOException e) {
+				   logger.warn("Não foi possível recuperar a resposta do servidor ",e);
+				   throw new ComunicationProtocolException(e);
+
+			}	
 	
-		}catch(IOException e){
-			 connection.disconnect();
-			 throw new ServiceErrorException(e.getMessage(),e);
-		}finally{
-			 connection.disconnect();
-		}
 				
 		   	
 			
@@ -79,39 +97,6 @@ public class CommunicationProtocol<T> {
 	}
 
 
-
-	public static Object httpPost(Object objetoEnvio, Class<?> tipoObjetoRetorno, String urlWebService) {
-	      Object objetoRetorno = null;
-		
-	      try {
-	         String requestJson = ParserJSON.toJson(objetoEnvio);
-			
-	         URL url = new URL(urlWebService);
-	         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-	         connection.setRequestMethod("POST");
-	         connection.setDoOutput(true);
-	         connection.setUseCaches(false);
-		     connection.setConnectTimeout(15000);
-	         connection.setRequestProperty("Content-Type", "application/json");
-	         connection.setRequestProperty("Accept", "application/json");
-	         connection.setRequestProperty("Content-Length", Integer.toString(requestJson.length()));
-				
-	         DataOutputStream stream = new DataOutputStream(connection.getOutputStream());
-	         stream.write(requestJson.getBytes("UTF-8"));
-	         stream.flush();
-	         stream.close();
-	         connection.connect();
-
-	         String responseJson = inputStreamToString(connection.getInputStream());
-	         connection.disconnect();
-	         objetoRetorno = ParserJSON.fromJson(responseJson, tipoObjetoRetorno);
-
-	      } catch (Exception e) {
-	         e.printStackTrace();
-	      }
-	      return objetoRetorno;
-	   }
-	
 	public static String inputStreamToString(InputStream is) throws IOException {
 		if (is != null) {
 			Writer writer = new StringWriter();

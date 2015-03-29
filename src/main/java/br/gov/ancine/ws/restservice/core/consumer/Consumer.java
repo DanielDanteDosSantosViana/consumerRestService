@@ -1,29 +1,46 @@
+/*===========================================================================
+COPYRIGHT 2015 Daniel Viana ALL RIGHTS RESERVED.
+This software cannot be copied, stored, distributed without
+Daniel Viana prior authorization.
+This file was made available on https://github.com/DanielDanteDosSantosViana and it
+is free to be redistributed or used under Creative Commons license 2.5 br:
+http://creativecommons.org/licenses/by-sa/2.5/br/
+============================================================================*/
+
 package br.gov.ancine.ws.restservice.core.consumer;
 
-import br.gov.ancine.ws.restservice.core.consumer.core.scan.ScanConsumer;
-import br.gov.ancine.ws.restservice.core.protocol.mensage.ResponseConsumer;
-import br.gov.ancine.ws.restservice.core.searchParameter.ParameterURI;
+import java.lang.reflect.ParameterizedType;
+
+import br.gov.ancine.ws.restservice.core.exception.ServiceErrorException;
+import br.gov.ancine.ws.restservice.core.searchParameter.Parameter;
 
 
-public final class Consumer extends AbstractConsumer {
+/**
+ * @author daniel
+ *
+ */
+public abstract class Consumer<T> {
 
-
-		
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	protected TypeConsumer<T> typeComsumer;
 	
-	private ScanConsumer scanConsumer;
-	
-	public ResponseConsumer target(String url){
-		
-		
-		return null;
+	public Consumer(){
+		typeComsumer = new TypeConsumer<T>(getEntityClass());
 	}
+	
+	public TypeConsumer<T> consumer(String target , Parameter parameter){
+		return typeComsumer.configureGetWithParameter(target, parameter);
+		
+	}
+	public TypeConsumer<T> consumer(String target){
+			return typeComsumer.configureGet(target);	
+	}
+	
+	public Class<?> getEntityClass() {
+		Class<?> clazz = (Class<?>) ((ParameterizedType) 
+				getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+		
+		return  clazz;
 
-	public ResponseConsumer target(String url,ParameterURI parameter){
-		return null;
 	}
 
 }

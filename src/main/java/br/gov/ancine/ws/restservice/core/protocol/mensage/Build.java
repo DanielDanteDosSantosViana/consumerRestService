@@ -1,5 +1,6 @@
 package br.gov.ancine.ws.restservice.core.protocol.mensage;
 
-public interface Response<T> {
-	public T getMensagem();
+public interface Build<T> {
+
+	Response<T> build();
 }

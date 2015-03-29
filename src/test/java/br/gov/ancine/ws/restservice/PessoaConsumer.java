@@ -1,29 +1,36 @@
 package br.gov.ancine.ws.restservice;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collection;
+import java.util.List;
 
-import br.gov.ancine.ws.restservice.core.consumer.AbstractConsumer;
+import br.gov.ancine.ws.restservice.core.consumer.Consumer;
 import br.gov.ancine.ws.restservice.core.exception.ServiceErrorException;
 import br.gov.ancine.ws.restservice.core.protocol.mensage.Response;
-import br.gov.ancine.ws.restservice.core.searchParameter.Search;
 
-public class PessoaConsumer extends AbstractConsumer {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class PessoaConsumer extends Consumer<PessoaDTO>  {
+
+	public Response<Collection<PessoaDTO>> getPessoa() throws ServiceErrorException{
+		
+		return consumer("http://127.0.0.1:8080/gerador-rest/pessoa/collectio").configureReturnCollection(List.class).get();
+		
+	}
 	
-	
-	public Response<PessoaDTO> getPessoaEnderecosPor(Long idPessoa) throws ServiceErrorException{
-		 
-		 Map<String, String> parametros = new HashMap<String, String>();
-		 parametros.put("dada",idPessoa.toString());
-		 
+	public static void main(String[] args) {
+		PessoaConsumer pessoa = new PessoaConsumer();
+		try {
+			Response<Collection<PessoaDTO>> responsePessoa = pessoa.getPessoa();
+			Collection<PessoaDTO> pessoas =responsePessoa.getMensagem();
+			String id = null;
+			for (PessoaDTO pessoaDTO : pessoas) {
+				 id = pessoaDTO.getIdPessoa();
+			}
+			System.out.println(id);
+			
+		} catch (ServiceErrorException e) {
 
-		return (Response<PessoaDTO>) consumesGet(new Search<PessoaDTO>("asdasd",parametros));
-
+			System.out.println(e.getMessage());
+		}
 	}
 
 }
