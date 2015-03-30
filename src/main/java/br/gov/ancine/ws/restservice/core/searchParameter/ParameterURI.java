@@ -11,7 +11,7 @@ public final class ParameterURI implements Parameter {
 	  return parameter.put(key, value);
 	}
 
-	public  Map<String, String> getParameter() {
+	public Map<String, String> getParameter() {
 		return parameter;
 	}
 

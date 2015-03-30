@@ -26,20 +26,21 @@ public final class ReturnCollectionType<T extends Collection> implements ITypeCo
 	protected Parameter paramURL;
 	protected ParserJSON parser = new ParserJSON();
 	private Class<?> entityDTO;
+	private Class<? extends Collection> typeCollection; 
 	
 	
-	public ReturnCollectionType(String targetURL ,Parameter paramURL,Class<?> entityDTO){
+	public ReturnCollectionType(String targetURL ,Parameter paramURL,Class<?> entityDTO,Class<? extends Collection> typeCollection){
 		this.targetURL = targetURL;
 		this.paramURL = paramURL;
 		this.entityDTO=entityDTO;
+		this.typeCollection = typeCollection;
 		
 	}
 	public Response<T> getWithParameter() throws ServiceErrorException {
 		try{
 			
 			ResponseProtocol response = new CommunicationProtocol().httpGet(new SearchParameterUri(targetURL,paramURL).getTarget());
-			Object objectParser = parser(response);
-			return new BuildResponse<T>(response.getStatusCode(),objectParser).build();
+			return new BuildResponse<T>(response.getStatusCode(),typeCollection,entityDTO).build(response.getJsonMensage());
 		
 		} catch (ComunicationProtocolException e) {
 			throw new ServiceErrorException("Error no protocoloca de comunicacao : "+ e.getMessage() , e);
@@ -60,8 +61,7 @@ public final class ReturnCollectionType<T extends Collection> implements ITypeCo
 		
 		try{
 			ResponseProtocol response = new CommunicationProtocol().httpGet(targetURL);
-			Object objectParser = parser(response);			
-			return new BuildResponse<T>(response.getStatusCode(),objectParser).build();	
+			return new BuildResponse<T>(response.getStatusCode(),typeCollection,entityDTO).build(response.getJsonMensage());
 		
 		} catch (ComunicationProtocolException e) {
 			throw new ServiceErrorException("Error no protocoloca de comunicacao : " + e.getMessage(), e);
@@ -70,9 +70,7 @@ public final class ReturnCollectionType<T extends Collection> implements ITypeCo
 		}
 	}
 	
-	private  Object parser(ResponseProtocol response) throws ParserJsonException{
-			return parser.collectionfromJson(response.getJsonMensage(),entityDTO);
-	}
+
 	
 
 

@@ -33,19 +33,16 @@ public final class TypeConsumer<T> implements ITypeConsumer<T> {
 	private Class<?> entityDTO;
 	protected String targetURL;
 	protected Parameter paramURL;
-	private ReturnCollectionType<Collection<T>> returnTypeCollection;
 	
 	public TypeConsumer(Class<?> entityDTO){
-		this.entityDTO = entityDTO;
-		
+		this.entityDTO = entityDTO;		
 	}
 
 	public Response<T> getWithParameter() throws ServiceErrorException {
 		try{
 		
 			ResponseProtocol response = new CommunicationProtocol().httpGet(new SearchParameterUri(targetURL,paramURL).getTarget());
-			Object objectParser = parser(response);
-			return new BuildResponse<T>(response.getStatusCode(),objectParser).build();
+			return new BuildResponse<T>(response.getStatusCode(),entityDTO).build(response.getJsonMensage());
 		
 		} catch (ComunicationProtocolException e) {
 			throw new ServiceErrorException("Error no protocoloca de comunicacao : " + e.getMessage(), e);
@@ -57,9 +54,8 @@ public final class TypeConsumer<T> implements ITypeConsumer<T> {
 	public Response<T> getEntity() throws ServiceErrorException{
 		try{	
 			ResponseProtocol response = new CommunicationProtocol().httpGet(targetURL);
-			Object objectParser = parser(response);
 			
-			return new BuildResponse<T>(response.getStatusCode(),objectParser).build();
+			return new BuildResponse<T>(response.getStatusCode(),entityDTO).build(response.getJsonMensage());
 		
 		} catch (ComunicationProtocolException e) {
 			throw new ServiceErrorException("Error no protocoloca de comunicacao : " + e.getMessage(), e);
@@ -76,7 +72,7 @@ public final class TypeConsumer<T> implements ITypeConsumer<T> {
 	}
 
 	public ReturnCollectionType<Collection<T>> configureReturnCollection(Class<? extends Collection> configuration){		
-		return returnTypeCollection = new ReturnCollectionType<Collection<T>>(targetURL, paramURL,entityDTO);
+		return new ReturnCollectionType<Collection<T>>(targetURL, paramURL,entityDTO,configuration);
 	}
 
 	protected TypeConsumer<T> configureGetWithParameter(String target , Parameter parameter){
@@ -90,9 +86,7 @@ public final class TypeConsumer<T> implements ITypeConsumer<T> {
 		return this;
 	}
 	
-	private  Object parser(ResponseProtocol response) throws ParserJsonException{
-		return  parser.fromJson(response.getJsonMensage(),entityDTO);
-	}
+
 	
 	/*	protected Response<T> post(){
 		

@@ -65,13 +65,13 @@ public class ParserJSON {
 	   }
 	   
 
-	   public Collection<Object> collectionfromJson(String json, Class<?> objectClass) throws ParserJsonException{
+	   public Collection<Object> collectionfromJson(String json, Class<?> objectClass , Class<? extends Collection> collection) throws ParserJsonException{
 	      
 		   try {
 
 		   ObjectMapper objecMapper = new ObjectMapper();
 		   Collection<Object> objCollection = objecMapper.readValue(json,
-				   objecMapper.getTypeFactory().constructCollectionType(List.class, objectClass)); 
+				   objecMapper.getTypeFactory().constructCollectionType(collection, objectClass)); 
 	
 		   return objCollection;
 			
