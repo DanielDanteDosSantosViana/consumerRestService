@@ -10,7 +10,11 @@ package br.gov.ancine.ws.restservice.core.searchParameter;
 
 import java.util.Map;
 
-public interface Parameter {
+public interface IParameterGET {
 	 String putParameter(String key, String value);
+	 
 	 Map<String, String> getParameter();
+	 
+	 
+	 
 }

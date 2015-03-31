@@ -9,6 +9,7 @@ http://creativecommons.org/licenses/by-sa/2.5/br/
 package br.gov.ancine.ws.restservice.core.protocol;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,7 +24,12 @@ import java.net.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+
+
 import br.gov.ancine.ws.restservice.core.exception.ComunicationProtocolException;
+import br.gov.ancine.ws.restservice.core.exception.ParserJsonException;
+import br.gov.ancine.ws.restservice.core.parser.ParserJSON;
 import br.gov.ancine.ws.restservice.core.protocol.mensage.ResponseProtocol;
 import br.gov.ancine.ws.restservice.core.searchParameter.SearchParameterUri;
 
@@ -73,11 +79,62 @@ public class CommunicationProtocol {
 				   logger.warn("Não foi possível recuperar a resposta do servidor ",e);
 				   throw new ComunicationProtocolException(e);
 
-			}	
+			}		
+   }
 	
-				
-		   	
+	
+	public ResponseProtocol httpPost(Object objetoEnvio, Class<?> tipoObjetoRetorno, String urlWebService) throws ComunicationProtocolException, ParserJsonException {
+	      Object objetoRetorno = null;
+		
+	      try {
+	         String requestJson = ParserJSON.toJson(objetoEnvio);
 			
+	         URL url = new URL(urlWebService);
+	         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	         connection.setRequestMethod("POST");
+	         connection.setDoOutput(true);
+	         connection.setUseCaches(false);
+		     connection.setConnectTimeout(15000);
+	         connection.setRequestProperty("Content-Type", "application/json");
+	         connection.setRequestProperty("Accept", "application/json");
+	         connection.setRequestProperty("Content-Length", Integer.toString(requestJson.length()));
+	         DataOutputStream stream = new DataOutputStream(connection.getOutputStream());
+	         stream.write(requestJson.getBytes("UTF-8"));
+	         stream.flush();
+	         stream.close();
+			 int statusCode = connection.getResponseCode();
+			 String responseJson = null;
+
+			   if(isStatusCodeOK(statusCode)){
+				   responseJson = inputStreamToString(connection.getInputStream());
+				   connection.disconnect();
+				   return new ResponseProtocol(statusCode, responseJson);
+				   	
+			   }else if(isStatusCode4xx(statusCode)){
+				   	 responseJson = inputStreamToString(connection.getErrorStream());
+				   	 connection.disconnect();
+				   	 return new ResponseProtocol(statusCode, responseJson);
+				   	 
+			   }else{
+				   logger.warn("Error Interno no Servidor status code "+statusCode);
+				   
+				   throw new ComunicationProtocolException("Error Interno no Servidor status code : "+statusCode
+						   +", Causado por : "+inputStreamToString(connection.getErrorStream()));
+			   }
+			
+			} catch (MalformedURLException e) {
+				   logger.warn("Error ao tentar montar URL : ",e);
+				   throw new ComunicationProtocolException(e);
+
+			} catch (ProtocolException e) {
+				   throw new ComunicationProtocolException(e);
+
+			} catch (IOException e) {
+				   logger.warn("Não foi possível recuperar a resposta do servidor ",e);
+				   throw new ComunicationProtocolException(e);
+
+			}	
+	     
    }
 
 

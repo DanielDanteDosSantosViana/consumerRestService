@@ -3,7 +3,7 @@ package br.gov.ancine.ws.restservice.core.searchParameter;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class ParameterURI implements Parameter {
+public final class ParameterGET implements IParameterGET {
 
 	private static Map<String, String> parameter = new HashMap<String, String>();
 	

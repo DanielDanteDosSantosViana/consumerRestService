@@ -20,72 +20,68 @@ import br.gov.ancine.ws.restservice.core.exception.ParserJsonException;
 
 public class ParserJSON {
 	static final Logger logger = LoggerFactory.getLogger(ParserJSON.class);
-	
-	public String toJson(Object objeto) throws ParserJsonException {
-	     
+
+	public static String toJson(Object objeto) throws ParserJsonException {
+
 		try{
-	    	  
-	    	  ObjectMapper mapper = new ObjectMapper();
-	    	  StringWriter jsonValue = new StringWriter();
-	    	  mapper.writeValue(new PrintWriter(jsonValue), objeto);
-	    	  return jsonValue.toString();
-	   
-	      } catch (JsonGenerationException e) {
-	    	  logger.warn("Erro Generico ao parsear entidade : " , e);
-	    	  throw new ParserJsonException(e);
-	      } catch (JsonMappingException e) {
-	    	  logger.warn("Erro no Mapeamento do objeto JSON para Object da entidade   : " , e);
-	    	  throw new ParserJsonException(e);
 
-	      } catch (IOException e) {
-	    	  logger.warn("Erro na escrita do json para o objeto  : " , e);
-	    	  throw new ParserJsonException(e);
-	      }
-	 }
+			ObjectMapper mapper = new ObjectMapper();
+			StringWriter jsonValue = new StringWriter();
+			mapper.writeValue(new PrintWriter(jsonValue), objeto);
+			return jsonValue.toString();
+
+		} catch (JsonGenerationException e) {
+			logger.warn("Erro Generico ao parsear entidade : " , e);
+			throw new ParserJsonException(e);
+		} catch (JsonMappingException e) {
+			logger.warn("Erro no Mapeamento do objeto JSON para Object da entidade   : " , e);
+			throw new ParserJsonException(e);
+
+		} catch (IOException e) {
+			logger.warn("Erro na escrita do json para o objeto  : " , e);
+			throw new ParserJsonException(e);
+		}
+	}
 
 
-	   public Object fromJson(String json, Class<?> objectClass) throws ParserJsonException{
-	      JsonFactory f = new MappingJsonFactory();
-	      JsonParser jp = null;
-	      Object obj = null;
-	     
-	      try {
+	public static Object fromJson(String json, Class<?> objectClass) throws ParserJsonException{
+		JsonFactory f = new MappingJsonFactory();
+		JsonParser jp = null;
+		Object obj = null;
+
+		try {
 			jp = f.createJsonParser(json);
-		
+
 			obj = jp.readValueAs(objectClass);
-			
+
 		} catch (JsonProcessingException e) {
-	    	  logger.warn("Erro ao tentar parsear a entidade  : " , e);
-			  throw new ParserJsonException(e);
+			logger.warn("Erro ao tentar parsear a entidade  : " , e);
+			throw new ParserJsonException(e);
 		} catch (IOException e) {
-	    	logger.warn("Erro no Mapeamento do objeto JSON para Object da entidade   : " , e);
+			logger.warn("Erro no Mapeamento do objeto JSON para Object da entidade   : " , e);
 			throw new ParserJsonException(e);
 		}
-	      return obj;
-	   }
-	   
+		return obj;
+	}
 
-	   public Collection<Object> collectionfromJson(String json, Class<?> objectClass , Class<? extends Collection> collection) throws ParserJsonException{
-	      
-		   try {
 
-		   ObjectMapper objecMapper = new ObjectMapper();
-		   Collection<Object> objCollection = objecMapper.readValue(json,
-				   objecMapper.getTypeFactory().constructCollectionType(collection, objectClass)); 
-	
-		   return objCollection;
-			
+	public Collection<Object> collectionfromJson(String json, Class<?> objectClass , Class<? extends Collection> collection) throws ParserJsonException{
+
+		try {
+
+			ObjectMapper objecMapper = new ObjectMapper();
+			Collection<Object> objCollection = objecMapper.readValue(json,
+					objecMapper.getTypeFactory().constructCollectionType(collection, objectClass)); 
+
+			return objCollection;
+
 		} catch (JsonProcessingException e) {
-	    	  logger.warn("Erro ao tentar parsear a entidade  : " , e);
-			  throw new ParserJsonException(e);
+			logger.warn("Erro ao tentar parsear a entidade  : " , e);
+			throw new ParserJsonException(e);
 		} catch (IOException e) {
-	    	logger.warn("Erro no Mapeamento do objeto JSON para Object da entidade   : " , e);
+			logger.warn("Erro no Mapeamento do objeto JSON para Object da entidade   : " , e);
 			throw new ParserJsonException(e);
 		}
-	   }
-	   
-	   
-	  
-	   
-	   
+	}
+
 }

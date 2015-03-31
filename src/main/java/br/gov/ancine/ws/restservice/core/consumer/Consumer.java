@@ -11,8 +11,8 @@ package br.gov.ancine.ws.restservice.core.consumer;
 
 import java.lang.reflect.ParameterizedType;
 
-import br.gov.ancine.ws.restservice.core.exception.ServiceErrorException;
-import br.gov.ancine.ws.restservice.core.searchParameter.Parameter;
+import br.gov.ancine.ws.restservice.core.searchParameter.IParameterGET;
+import br.gov.ancine.ws.restservice.core.searchParameter.IParameterPOST;
 
 
 /**
@@ -27,12 +27,21 @@ public abstract class Consumer<T> {
 		typeComsumer = new TypeConsumer<T>(getEntityClass());
 	}
 	
-	public TypeConsumer<T> consumer(String target , Parameter parameter){
+	public TypeConsumer<T> consumer(String target , IParameterGET parameter){
 		return typeComsumer.configureGetWithParameter(target, parameter);
 		
 	}
 	public TypeConsumer<T> consumer(String target){
 			return typeComsumer.configureGet(target);	
+	}
+	
+	
+	public TypeConsumer<T> consumerPost(String target , IParameterPOST parameter){
+		return typeComsumer.configurePostWithParameter(target, parameter);
+		
+	}
+	public TypeConsumer<T> consumerPost(String target){
+		return typeComsumer.configurePost(target);	
 	}
 	
 	public Class<?> getEntityClass() {
