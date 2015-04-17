@@ -18,7 +18,7 @@ import br.com.ws.restservice.core.protocol.CommunicationProtocol;
 import br.com.ws.restservice.core.protocol.mensage.BuildResponse;
 import br.com.ws.restservice.core.protocol.mensage.Response;
 import br.com.ws.restservice.core.protocol.mensage.ResponseProtocol;
-import br.com.ws.restservice.core.searchParameter.Parameter;
+import br.com.ws.restservice.core.searchParameter.IParameter;
 import br.com.ws.restservice.core.searchParameter.SearchParameterUri;
 
 
@@ -32,7 +32,7 @@ public final class TypeConsumer<T> implements ITypeConsumer<T> {
 	protected ParserJSON parser = new ParserJSON();
 	private Class<?> entityDTO;
 	protected String targetURL;
-	protected Parameter param;
+	protected IParameter param;
 
 	
 	public TypeConsumer(Class<?> entityDTO){
@@ -43,6 +43,7 @@ public final class TypeConsumer<T> implements ITypeConsumer<T> {
 		try{
 		
 			ResponseProtocol response = new CommunicationProtocol().httpGet(new SearchParameterUri(targetURL,param).getTarget());
+			param.cleanMap();
 			return new BuildResponse<T>(response.getStatusCode(),entityDTO).build(response.getJsonMensage());
 		
 		} catch (ComunicationProtocolException e) {
@@ -77,7 +78,7 @@ public final class TypeConsumer<T> implements ITypeConsumer<T> {
 		return new ReturnCollectionType<Collection<T>>(targetURL, param,entityDTO,configuration);
 	}
 
-	protected TypeConsumer<T> configureGetWithParameter(String target , Parameter parameter){
+	protected TypeConsumer<T> configureGetWithParameter(String target , IParameter parameter){
 		this.param = parameter;
 		this.targetURL=target;
 		return this;
@@ -94,7 +95,7 @@ public final class TypeConsumer<T> implements ITypeConsumer<T> {
 		return this;
 	}
 	
-	protected TypeConsumer<T> configurePostWithParameter(String target , Parameter parameter){
+	protected TypeConsumer<T> configurePostWithParameter(String target , IParameter parameter){
 		this.param = parameter;
 		this.targetURL=target;
 		return this;
@@ -124,6 +125,7 @@ public final class TypeConsumer<T> implements ITypeConsumer<T> {
 		try
 		{
 			ResponseProtocol response = new CommunicationProtocol().httpPost(param,entityDTO,targetURL);
+			param.cleanMap();
 			return new BuildResponse<T>(response.getStatusCode(),entityDTO).build(response.getJsonMensage());
 		
 		} catch (ParserJsonException e) {

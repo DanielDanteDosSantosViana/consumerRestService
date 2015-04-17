@@ -21,18 +21,18 @@ import br.com.ws.restservice.core.protocol.CommunicationProtocol;
 import br.com.ws.restservice.core.protocol.mensage.BuildResponse;
 import br.com.ws.restservice.core.protocol.mensage.Response;
 import br.com.ws.restservice.core.protocol.mensage.ResponseProtocol;
-import br.com.ws.restservice.core.searchParameter.Parameter;
+import br.com.ws.restservice.core.searchParameter.IParameter;
 import br.com.ws.restservice.core.searchParameter.SearchParameterUri;
 
 public final class ReturnCollectionType<T extends Collection> implements ITypeConsumer<T>{
 	protected String targetURL;
-	protected Parameter param;
+	protected IParameter param;
 	protected ParserJSON parser = new ParserJSON();
 	private Class<?> entityDTO;
 	private Class<? extends Collection> typeCollection; 
 	
 	
-	public ReturnCollectionType(String targetURL ,Parameter paramURL,Class<?> entityDTO,Class<? extends Collection> typeCollection){
+	public ReturnCollectionType(String targetURL ,IParameter paramURL,Class<?> entityDTO,Class<? extends Collection> typeCollection){
 		this.targetURL = targetURL;
 		this.param = paramURL;
 		this.entityDTO=entityDTO;
@@ -43,6 +43,7 @@ public final class ReturnCollectionType<T extends Collection> implements ITypeCo
 		try{
 			
 			ResponseProtocol response = new CommunicationProtocol().httpGet(new SearchParameterUri(targetURL,param).getTarget());
+			param.cleanMap();
 			return new BuildResponse<T>(response.getStatusCode(),typeCollection,entityDTO).build(response.getJsonMensage());
 		
 		} catch (ComunicationProtocolException e) {
@@ -98,6 +99,7 @@ public final class ReturnCollectionType<T extends Collection> implements ITypeCo
 		try{
 		
 			ResponseProtocol response = new CommunicationProtocol().httpPost(param,entityDTO,targetURL);
+			param.cleanMap();
 			return new BuildResponse<T>(response.getStatusCode(),typeCollection,entityDTO).build(response.getJsonMensage());
 		
 		} catch (ParserJsonException e) {

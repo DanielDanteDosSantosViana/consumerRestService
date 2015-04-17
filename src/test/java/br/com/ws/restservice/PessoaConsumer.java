@@ -7,14 +7,14 @@ import br.com.ws.restservice.core.consumer.Consumer;
 import br.com.ws.restservice.core.exception.ServiceErrorException;
 import br.com.ws.restservice.core.protocol.mensage.ErrorResponse;
 import br.com.ws.restservice.core.protocol.mensage.Response;
+import br.com.ws.restservice.core.searchParameter.IParameter;
 import br.com.ws.restservice.core.searchParameter.Parameter;
-import br.com.ws.restservice.core.searchParameter.ParameterGET;
 
 
 public class PessoaConsumer extends Consumer<PessoaDTO>  {
 
 	public Response<Collection<PessoaDTO>> getPessoas() throws ServiceErrorException{
-		Parameter param = new ParameterGET();
+		IParameter param = new Parameter();
 		param.putParameter("id", new String[]{"1","2","3"});
 		
 		return consumer("http://127.0.0.1:8080/gerador-rest/pessoa/pessoas",param).configureReturnCollection(List.class).post();

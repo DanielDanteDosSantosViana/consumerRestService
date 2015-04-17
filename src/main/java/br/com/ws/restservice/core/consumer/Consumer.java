@@ -11,7 +11,7 @@ package br.com.ws.restservice.core.consumer;
 
 import java.lang.reflect.ParameterizedType;
 
-import br.com.ws.restservice.core.searchParameter.Parameter;
+import br.com.ws.restservice.core.searchParameter.IParameter;
 
 
 /**
@@ -26,7 +26,7 @@ public abstract class Consumer<T> {
 		typeComsumer = new TypeConsumer<T>(getEntityClass());
 	}
 	
-	public TypeConsumer<T> consumer(String target , Parameter parameter){
+	public TypeConsumer<T> consumer(String target , IParameter parameter){
 		return typeComsumer.configureGetWithParameter(target, parameter);
 		
 	}
@@ -35,7 +35,7 @@ public abstract class Consumer<T> {
 	}
 	
 	
-	public TypeConsumer<T> consumerPost(String target , Parameter parameter){
+	public TypeConsumer<T> consumerPost(String target , IParameter parameter){
 		return typeComsumer.configurePostWithParameter(target, parameter);
 		
 	}

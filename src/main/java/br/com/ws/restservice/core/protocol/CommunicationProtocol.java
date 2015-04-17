@@ -29,7 +29,7 @@ import br.com.ws.restservice.core.exception.ComunicationProtocolException;
 import br.com.ws.restservice.core.exception.ParserJsonException;
 import br.com.ws.restservice.core.parser.ParserJSON;
 import br.com.ws.restservice.core.protocol.mensage.ResponseProtocol;
-import br.com.ws.restservice.core.searchParameter.Parameter;
+import br.com.ws.restservice.core.searchParameter.IParameter;
 import br.com.ws.restservice.core.searchParameter.SearchParameterUri;
 
 public class CommunicationProtocol {
@@ -82,7 +82,7 @@ public class CommunicationProtocol {
    }
 	
 	
-	public ResponseProtocol httpPost(Parameter parameter, Class<?> tipoObjetoRetorno, String urlWebService) throws ComunicationProtocolException, ParserJsonException {
+	public ResponseProtocol httpPost(IParameter parameter, Class<?> tipoObjetoRetorno, String urlWebService) throws ComunicationProtocolException, ParserJsonException {
 			
 			 String requestJson =null;
 			 
@@ -138,7 +138,7 @@ public class CommunicationProtocol {
 	     
    }
 
-	private String getParameterToJSON(Parameter parameter) throws ParserJsonException {
+	private String getParameterToJSON(IParameter parameter) throws ParserJsonException {
 	    
 	    String requestJson = null;
 		Collection<Object> listaParamValues = parameter.getParameter().values();

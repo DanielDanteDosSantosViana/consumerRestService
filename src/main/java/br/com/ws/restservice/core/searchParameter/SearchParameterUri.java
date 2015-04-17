@@ -10,9 +10,9 @@ public class SearchParameterUri implements Search{
 	static final Logger logger = LoggerFactory.getLogger(SearchParameterUri.class);
 
 	protected String target;
-	protected Parameter searchParameter;
+	protected IParameter searchParameter;
 	
-	public SearchParameterUri(String target , Parameter ParamUri){
+	public SearchParameterUri(String target , IParameter ParamUri){
 		this.target = target;
 		this.searchParameter = ParamUri;
 	}
